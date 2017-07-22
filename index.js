@@ -8,7 +8,7 @@ function main()
     _outpoint=document.querySelector(".output");
 
     _ibox=document.querySelector(".ibox");
-    _ibox.addEventListener("keypress",(e)=>{
+    _ibox.addEventListener("keydown",(e)=>{
         setTimeout(()=>{markDupes(_ibox.value)},100);
     });
 }
@@ -53,7 +53,8 @@ function markDupes(text)
     {
         _outpoint.children[x].dataset.index=x;
         _outpoint.children[x].addEventListener("mouseenter",(e)=>{
-            _ibox.setSelectionRange(e.currentTarget.dataset.index,e.currentTarget.dataset.index);
+            _ibox.focus();
+            _ibox.setSelectionRange(parseInt(e.currentTarget.dataset.index)+1,parseInt(e.currentTarget.dataset.index)+1);
         });
     }
 }
