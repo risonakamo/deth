@@ -1,5 +1,6 @@
 window.onload=main;
 
+var _outpoint;
 var _curText="";
 var _ibox;
 
@@ -9,52 +10,66 @@ function main()
 
     _ibox=document.querySelector(".ibox");
     _ibox.addEventListener("keydown",(e)=>{
-        setTimeout(()=>{markDupes(_ibox.value)},100);
+        setTimeout(()=>{markDupes2(_ibox.value)},100);
     });
 }
 
-var _outpoint;
-function markDupes(text)
+function markDupes2(text)
 {
     text=text.split("");
+    var text_l=text.length;
 
     var dupes={};
-    for (var x=0,l=text.length;x<l;x++)
+    for (var x=0;x<text_l;x++)
     {
         text[x]=text[x].toUpperCase();
-        if (dupes[text[x]]==undefined)
+        if (!dupes[text[x]])
         {
-            dupes[text[x]]=x;
+            dupes[text[x]]=[x];
         }
 
         else
         {
-            if (dupes[text[x]]>=0)
-            {
-                text[dupes[text[x]]]=`<span class="dupe">${text[dupes[text[x]]]}</span>`;
-                dupes[text[x]]=-1;
-            }
-
-            text[x]=`<span class="dupe">${text[x]}</span>`;
+            dupes[text[x]].push(x);
         }
     }
 
-    for (var x in dupes)
+    var isdupe=0;
+    for (var x=0;x<text_l;x++)
     {
-        if (dupes[x]>-1)
+        if (dupes[text[x]].length>1)
         {
-            text[dupes[x]]=`<span>${x}</span>`;
+            isdupe="dupe";
         }
+
+        else
+        {
+            isdupe="";
+        }
+
+        text[x]=`<span class="${isdupe}" data-index="${x}" data-letter="${text[x]}">${text[x]}</span>`;
     }
 
     _outpoint.innerHTML=text.join("");
 
-    for (var x=0,l=_outpoint.children.length;x<l;x++)
+    for (var x=0;x<text_l;x++)
     {
-        _outpoint.children[x].dataset.index=x;
         _outpoint.children[x].addEventListener("mouseenter",(e)=>{
             _ibox.focus();
-            _ibox.setSelectionRange(parseInt(e.currentTarget.dataset.index)+1,parseInt(e.currentTarget.dataset.index)+1);
+            _ibox.setSelectionRange(parseInt(e.currentTarget.dataset.index)+1,
+                parseInt(e.currentTarget.dataset.index)+1);
+
+            for (var y=0,l=dupes[e.currentTarget.dataset.letter].length;y<l;y++)
+            {
+                _outpoint.children[dupes[e.currentTarget.dataset.letter][y]].classList.add("dupe-select");
+            }
+        });
+
+        _outpoint.children[x].addEventListener("mouseleave",(e)=>{
+            for (var y=0,l=dupes[e.currentTarget.dataset.letter].length;y<l;y++)
+            {
+                _outpoint.children[dupes[e.currentTarget.dataset.letter][y]].classList.remove("dupe-select");
+            }
         });
     }
 }
