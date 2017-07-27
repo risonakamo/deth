@@ -29,8 +29,3 @@ body
 {
     color: blue;
 }
-
-.output span:hover
-{
-    border-right: 2px solid black;
-}
